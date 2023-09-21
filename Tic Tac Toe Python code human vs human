@@ -1,0 +1,67 @@
+import tkinter as tk
+
+# Create the main window
+root = tk.Tk()
+root.title("Tic-Tac-Toe")
+
+# Define variables
+player = "X"
+board = [" " for _ in range(9)]
+buttons = []
+
+# Create game board buttons
+def create_buttons():
+    for i in range(3):
+        for j in range(3):
+            button = tk.Button(root, text=" ", font=("normal", 20), width=8, height=2,
+                               command=lambda i=i, j=j: on_button_click(i, j))
+            button.grid(row=i, column=j)
+            buttons.append(button)
+
+# Handle button clicks
+def on_button_click(row, col):
+    global player
+
+    # Check if the cell is empty and the game is not over
+    if board[row * 3 + col] == " " and not is_game_over():
+        buttons[row * 3 + col].config(text=player)
+        board[row * 3 + col] = player
+
+        # Check if the player has won
+        if is_winner(player):
+            display_message(f"Player {player} wins!")
+            return
+
+        # Check if it's a tie
+        if " " not in board:
+            display_message("It's a tie!")
+            return
+
+        # Switch to the other player's turn
+        player = "X" if player == "O" else "O"
+
+# Check if the game is over (win or tie)
+def is_game_over():
+    return is_winner("X") or is_winner("O") or " " not in board
+
+# Check if a player has won
+def is_winner(player_symbol):
+    win_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6)]
+    for combo in win_combinations:
+        if board[combo[0]] == board[combo[1]] == board[combo[2]] == player_symbol:
+            return True
+    return False
+
+# Display a message in a popup window
+def display_message(message):
+    message_window = tk.Toplevel(root)
+    message_label = tk.Label(message_window, text=message, font=("normal", 20))
+    message_label.pack()
+    message_window.grab_set()
+    root.after(2000, message_window.destroy)
+
+# Initialize the game
+create_buttons()
+
+# Run the game loop
+root.mainloop()
